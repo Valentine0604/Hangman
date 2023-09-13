@@ -1,7 +1,6 @@
 import java.util.Scanner;
 import java.util.Random;
-
-public class Hangman {
+public class Hangman{
     public static final String[] words = {"ant", "baboon", "badger", "bat", "bear", "beaver", "camel",
             "cat", "clam", "cobra", "cougar", "coyote", "crow", "deer",
             "dog", "donkey", "duck", "eagle", "ferret", "fox", "frog", "goat",
@@ -109,7 +108,14 @@ public class Hangman {
                 System.out.println("Wanna use a hint? Press '?'");
             }
 
-            guess = scanner.next().charAt(0);
+            try{
+                guess = scanner.next().charAt(0);
+                InvalidCharacterException.validateInput(guess);
+            } catch(InvalidCharacterException e){
+                System.err.println(e.getMessage());
+                continue;
+            }
+
             guess = Character.toLowerCase(guess);
 
             if (guess == '?' && hintCounter == 0) {
