@@ -1,16 +1,8 @@
+import java.sql.SQLOutput;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Random;
 public class Hangman{
-    public static final String[] words = {"ant", "baboon", "badger", "bat", "bear", "beaver", "camel",
-            "cat", "clam", "cobra", "cougar", "coyote", "crow", "deer",
-            "dog", "donkey", "duck", "eagle", "ferret", "fox", "frog", "goat",
-            "goose", "hawk", "lion", "lizard", "llama", "mole", "monkey", "moose",
-            "mouse", "mule", "newt", "otter", "owl", "panda", "parrot", "pigeon",
-            "python", "rabbit", "ram", "rat", "raven", "rhino", "salmon", "seal",
-            "shark", "sheep", "skunk", "sloth", "snake", "spider", "stork", "swan",
-            "tiger", "toad", "trout", "turkey", "turtle", "weasel", "whale", "wolf",
-            "wombat", "zebra"};
-
     public static final String[] gallows = {"+---+\n" +
             "|   |\n" +
             "    |\n" +
@@ -68,18 +60,14 @@ public class Hangman{
                     " ========="};
 
     public static final int MAX_MISSES = 6;
-    public static final int MAX_WORDS = words.length;
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        Random random = new Random();
 
-        int index = random.nextInt(MAX_WORDS);
-        char[] chosenWord = words[index].toCharArray();
-        char[] guessArray = GenerateGuessArray(chosenWord);
-        char[] missesArray = new char[MAX_MISSES];
+        String word = "";
         boolean checker;
+        boolean isValid = false;
 
         char guess = ' ';
         int hintCounter = 0;
@@ -87,7 +75,23 @@ public class Hangman{
         int guessed = 0;
 
         System.out.println("Welcome to Hangman! Press anything to play!");
+        PrintGallows(MAX_MISSES);
         scanner.nextLine();
+
+        while(!isValid){
+            try{
+                System.out.print("Your word: ");
+                word = scanner.nextLine();
+                NoSpecialCharactersOrDigitsException.validateWord(word);
+                isValid = true;
+            } catch(NoSpecialCharactersOrDigitsException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        char[] chosenWord = word.toCharArray();
+        char[] guessArray = GenerateGuessArray(chosenWord);
+        char[] missesArray = new char[MAX_MISSES];
 
         while(true) {
             if (guess == '?') {
@@ -101,12 +105,11 @@ public class Hangman{
             PrintGallows(missed);
             PrintGuessArray(guessArray);
             System.out.print("\n");
-            System.out.print("Your letter: ");
-
             if (hintCounter == 0) {
-                System.out.print("\n");
                 System.out.println("Wanna use a hint? Press '?'");
             }
+            System.out.print("\n");
+            System.out.print("Your letter: ");
 
             try{
                 guess = scanner.next().charAt(0);
@@ -154,7 +157,7 @@ public class Hangman{
                 PrintGuessArray(guessArray);
                 System.out.print("\n");
                 System.out.println("You lost!");
-                System.out.println("Word: " + words[index]);
+                System.out.println("Word: " + Arrays.toString(chosenWord));
                 break;
             }
 
@@ -235,7 +238,6 @@ public class Hangman{
                 return false;
             }
         }
-
         return true;
     }
 }
