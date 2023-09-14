@@ -8,7 +8,7 @@ public class NoSpecialCharactersOrDigitsException extends Exception{
             throw new NoSpecialCharactersOrDigitsException("Your word cannot include special characters or digits.");
         }
         else if(input.isBlank()){
-            throw new NoSpecialCharactersOrDigitsException("You must choose a word");
+            throw new NoSpecialCharactersOrDigitsException("You can't start a game without a word.");
         }
     }
 }
