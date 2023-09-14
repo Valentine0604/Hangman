@@ -63,18 +63,34 @@ public class Hangman{
 
         Scanner scanner = new Scanner(System.in);
 
-        String word = "";
-        boolean checker;
-        boolean isValid = false;
-
         char guess = ' ';
         int hintCounter = 0;
         int missed = 0;
-        int guessed = 0;
+
+        start();
+
+        char[] chosenWord = inputAWord().toCharArray();
+        char[] guessArray = generateGuessArray(chosenWord);
+        HashSet<Character> misses = new HashSet<>();
+
+        hangmanGame(guess,missed,hintCounter,misses,guessArray,chosenWord);
+
+        scanner.close();
+    }
+
+    public static void start(){
+        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to Hangman! Press anything to play!");
-        PrintGallows(MAX_MISSES);
+        printGallows(MAX_MISSES);
         scanner.nextLine();
+    }
+
+    public static String inputAWord(){
+        Scanner scanner = new Scanner(System.in);
+
+        String word = "";
+        boolean isValid = false;
 
         while(!isValid){
             try{
@@ -87,10 +103,13 @@ public class Hangman{
             }
         }
 
-        char[] chosenWord = word.toCharArray();
-        char[] guessArray = GenerateGuessArray(chosenWord);
-        HashSet<Character> misses = new HashSet<>();
+        return word;
+    }
 
+    public static void hangmanGame(char guess, int missed, int hintCounter, HashSet<Character> misses, char[] guessArray, char[] chosenWord){
+        Scanner scanner = new Scanner(System.in);
+
+        boolean checker;
         while(true) {
             if (guess == '?') {
                 System.out.println("Current letter: ");
@@ -98,10 +117,10 @@ public class Hangman{
                 System.out.println("Current letter: " + guess);
             }
             System.out.print("Missed letters: ");
-            PrintMissesArray(misses);
+            printMissesArray(misses);
             System.out.print("\n");
-            PrintGallows(missed);
-            PrintGuessArray(guessArray);
+            printGallows(missed);
+            printGuessArray(guessArray);
             System.out.print("\n");
             if (hintCounter == 0) {
                 System.out.println("Wanna use a hint? Press '?'");
@@ -120,8 +139,7 @@ public class Hangman{
             guess = Character.toLowerCase(guess);
 
             if (guess == '?' && hintCounter == 0) {
-                Hint(guessArray, chosenWord);
-                guessed++;
+                hint(guessArray, chosenWord);
                 hintCounter++;
                 continue;
             } else if (guess == '?' && hintCounter != 0) {
@@ -129,11 +147,10 @@ public class Hangman{
                 continue;
             }
 
-            checker = CheckGuess(guess, chosenWord);
+            checker = checkGuess(guess, chosenWord);
 
             if (checker) {
-                ReplaceLetters(guessArray, chosenWord, guess);
-                guessed++;
+                replaceLetters(guessArray, chosenWord, guess);
             } else {
                 System.out.println("Wrong letter!");
                 if (!checkMisses(guess, misses)) {
@@ -143,16 +160,16 @@ public class Hangman{
             }
 
             if (isFinished(guessArray)) {
-                PrintGallows(guessed);
-                PrintGuessArray(guessArray);
+                printGallows(missed);
+                printGuessArray(guessArray);
                 System.out.print("\n");
                 System.out.println("You won!");
                 break;
             }
 
             if (missed == 6) {
-                PrintGallows(missed);
-                PrintGuessArray(guessArray);
+                printGallows(missed);
+                printGuessArray(guessArray);
                 System.out.print("\n");
                 System.out.println("You lost!");
                 System.out.println("Word: " + Arrays.toString(chosenWord));
@@ -160,15 +177,14 @@ public class Hangman{
             }
 
         }
-        scanner.close();
-    }
 
+    }
     /**
      * Function name:
      *
      * @return int Returns a random number between 0 and 6
      */
-    public static char[] GenerateGuessArray(char[] chosenWordArray) {
+    public static char[] generateGuessArray(char[] chosenWordArray) {
         char[] guessBoard = new char[chosenWordArray.length];
 
         for (int i = 0; i < chosenWordArray.length; i++) {
@@ -177,7 +193,7 @@ public class Hangman{
         return guessBoard;
     }
 
-    public static boolean CheckGuess(char guess, char[] chosenWord) {
+    public static boolean checkGuess(char guess, char[] chosenWord) {
 
         for (char c : chosenWord) {
             if (guess == c) {
@@ -194,7 +210,7 @@ public class Hangman{
         return false;
     }
 
-    public static void ReplaceLetters(char[] guessBoard, char[] chosenWord, char guess) {
+    public static void replaceLetters(char[] guessBoard, char[] chosenWord, char guess) {
 
         for (int i = 0; i < chosenWord.length; i++) {
             if (guess == chosenWord[i] && guessBoard[i] == '_') {
@@ -203,23 +219,23 @@ public class Hangman{
         }
     }
 
-    public static void PrintGuessArray(char[] guessBoard) {
+    public static void printGuessArray(char[] guessBoard) {
         for (int i = 0; i < guessBoard.length; i++) {
             System.out.print(guessBoard[i] + " ");
         }
     }
 
-    public static void PrintMissesArray(HashSet<Character> misses) {
+    public static void printMissesArray(HashSet<Character> misses) {
         for(Character c : misses){
             System.out.print(c + " ");
         }
     }
 
-    public static void PrintGallows(int missed) {
+    public static void printGallows(int missed) {
         System.out.println(gallows[missed]);
     }
 
-    public static void Hint(char[] guessBoard, char[] chosenWord) {
+    public static void hint(char[] guessBoard, char[] chosenWord) {
         Random rand = new Random();
         boolean isFound = false;
         char letter = ' ';
@@ -228,7 +244,7 @@ public class Hangman{
             int index = rand.nextInt(chosenWord.length);
             if (guessBoard[index] == '_') {
                 letter = chosenWord[index];
-                ReplaceLetters(guessBoard,chosenWord,letter);
+                replaceLetters(guessBoard,chosenWord,letter);
                 isFound = true;
             }
         }
