@@ -1,5 +1,26 @@
 import java.util.*;
 
+/**
+ * Hangman is a word-guessing game where one player thinks of a word, and the other player tries
+ * to guess it by suggesting letters. The game continues until the guessing player either
+ * correctly guesses the word or makes too many incorrect guesses. This program implements
+ * a text-based version of the Hangman game.
+ *
+ * Rules:
+ * - The maximum number of allowed incorrect guesses is 6.
+ * - Players can use a hint to reveal a random letter in the word (limited to one hint).
+ * - Special characters and digits are not allowed in the word to be guessed.
+ *
+ * Instructions:
+ * - Enter a word for your opponent to guess, ensuring it contains only letters.
+ * - The game displays an initial empty gallows and starts the guessing phase.
+ * - Players guess letters by entering them.
+ * - Players can use a hint by entering '?' (limited to one hint).
+ * - The game ends when the word is guessed correctly or the maximum incorrect guesses are reached.
+ *
+ * Enjoy playing Hangman!
+ */
+
 public class Hangman{
 
     /**
@@ -258,8 +279,8 @@ public class Hangman{
     /**
      * Function name: generateGuessArray
      *
-     * Generates an array representing the current state of the word to guess, using underscores
-     * to represent unguessed letters and initializing the array based on the length of the chosen word.
+     * Initializes and returns an array representing the current state of the word to guess.
+     * The array is filled with underscores ('_') to represent unguessed letters.
      *
      * @param chosenWordArray The array containing the characters of the word to guess.
      * @return An array of underscores with the same length as the chosen word.
