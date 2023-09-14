@@ -71,7 +71,7 @@ public class Hangman{
 
         char[] chosenWord = inputAWord().toCharArray();
         char[] guessArray = generateGuessArray(chosenWord);
-        HashSet<Character> misses = new HashSet<>();
+        ArrayList<Character> misses = new ArrayList<>();
 
         hangmanGame(guess,missed,hintCounter,misses,guessArray,chosenWord);
 
@@ -106,7 +106,7 @@ public class Hangman{
         return word;
     }
 
-    public static void hangmanGame(char guess, int missed, int hintCounter, HashSet<Character> misses, char[] guessArray, char[] chosenWord){
+    public static void hangmanGame(char guess, int missed, int hintCounter, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
         Scanner scanner = new Scanner(System.in);
 
         boolean checker;
@@ -203,7 +203,7 @@ public class Hangman{
         return false;
     }
 
-    public static boolean checkMisses(char guess, HashSet<Character> misses){
+    public static boolean checkMisses(char guess, ArrayList<Character> misses){
         if(misses.contains(guess)){
             return true;
         }
@@ -225,7 +225,7 @@ public class Hangman{
         }
     }
 
-    public static void printMissesArray(HashSet<Character> misses) {
+    public static void printMissesArray(ArrayList<Character> misses) {
         for(Character c : misses){
             System.out.print(c + " ");
         }
