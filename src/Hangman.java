@@ -1,7 +1,17 @@
 import java.util.*;
 
 public class Hangman{
-    public static final String[] gallows = {"+---+\n" +
+
+    /**
+     * An array representing different stages of the Hangman gallows.
+     *
+     * This array contains ASCII art representations of the Hangman gallows at various stages of the game.
+     * Each element in the array corresponds to a different number of incorrect guesses.
+     * The gallows become progressively complete as the number of incorrect guesses increases.
+     */
+    public static final String[] gallows = {
+            // ASCII art for the gallows with 0 incorrect guesses
+            "+---+\n" +
             "|   |\n" +
             "    |\n" +
             "    |\n" +
@@ -9,6 +19,7 @@ public class Hangman{
             "    |\n" +
             "=========",
 
+            // ASCII art for the gallows with 1 incorrect guess
             "+---+\n" +
                     "|   |\n" +
                     "O   |\n" +
@@ -17,6 +28,7 @@ public class Hangman{
                     "    |\n" +
                     "=========",
 
+            // ASCII art for the gallows with 2 incorrect guesses
             "+---+\n" +
                     "|   |\n" +
                     "O   |\n" +
@@ -25,6 +37,7 @@ public class Hangman{
                     "    |\n" +
                     "=========",
 
+            // ASCII art for the gallows with 3 incorrect guesses
             " +---+\n" +
                     " |   |\n" +
                     " O   |\n" +
@@ -33,6 +46,7 @@ public class Hangman{
                     "     |\n" +
                     " =========",
 
+            // ASCII art for the gallows with 4 incorrect guesses
             " +---+\n" +
                     " |   |\n" +
                     " O   |\n" +
@@ -41,6 +55,7 @@ public class Hangman{
                     "     |\n" +
                     " =========",
 
+            // ASCII art for the gallows with 5 incorrect guesses
             " +---+\n" +
                     " |   |\n" +
                     " O   |\n" +
@@ -49,6 +64,8 @@ public class Hangman{
                     "     |\n" +
                     " =========",
 
+
+            // ASCII art for the gallows with 6 incorrect guesses
             " +---+\n" +
                     " |   |\n" +
                     " O   |\n" +
@@ -57,26 +74,64 @@ public class Hangman{
                     "     |\n" +
                     " ========="};
 
+    /**
+     * The maximum number of allowed incorrect guesses in the Hangman game.
+     * When a player reaches this limit, they lose the game.
+     */
     public static final int MAX_MISSES = 6;
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
 
+        /**
+         * The current guessed letter in the Hangman game.
+         * It's initially set to a space character (' ').
+         */
         char guess = ' ';
+
+        /**
+         * The number of hints used by the player in the Hangman game.
+         * It's initially set to 0.
+         */
         int hintCounter = 0;
+
+        /**
+         * The number of incorrect guesses made by the player in the Hangman game.
+         * It's initially set to 0.
+         */
         int missed = 0;
 
         start();
 
+        /**
+         * Converts the chosen word obtained from user input into a character array.
+         */
         char[] chosenWord = inputAWord().toCharArray();
+
+        /**
+         * Initializes an array to store the current guesses in the Hangman game,
+         * initially filled with underscores representing unguessed letters.
+         */
         char[] guessArray = generateGuessArray(chosenWord);
+
+        /**
+         * Stores the missed letters in the Hangman game.
+         * It's initially an empty ArrayList.
+         */
         ArrayList<Character> misses = new ArrayList<>();
 
         hangmanGame(guess,missed,hintCounter,misses,guessArray,chosenWord);
 
         scanner.close();
     }
+
+    /**
+     * Function name: start
+     *
+     * Displays a welcome message and prompts the user to start the game.
+     * Also, initializes the game display with an empty gallows.
+     */
 
     public static void start(){
         Scanner scanner = new Scanner(System.in);
@@ -85,6 +140,14 @@ public class Hangman{
         printGallows(MAX_MISSES);
         scanner.nextLine();
     }
+
+    /**
+     * Function name: inputAWord
+     *
+     * Reads a word input from the user, ensuring it contains no special characters or digits.
+     *
+     * @return A valid word entered by the user.
+     */
 
     public static String inputAWord(){
         Scanner scanner = new Scanner(System.in);
@@ -106,6 +169,18 @@ public class Hangman{
         return word;
     }
 
+    /**
+     * Function game: hangmanGame
+     *
+     * Starts the Hangman game loop, allowing the player to make guesses and manage the game.
+     *
+     * @param guess         The current guess made by the player.
+     * @param missed        The number of incorrect guesses made by the player.
+     * @param hintCounter   The number of hints used by the player [max. 1].
+     * @param misses        The list of letters that have been guessed incorrectly.
+     * @param guessArray    The array representing the current state of the word to guess.
+     * @param chosenWord    The word that the player needs to guess.
+     */
     public static void hangmanGame(char guess, int missed, int hintCounter, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
         Scanner scanner = new Scanner(System.in);
 
@@ -179,10 +254,15 @@ public class Hangman{
         }
 
     }
+
     /**
-     * Function name:
+     * Function name: generateGuessArray
      *
-     * @return int Returns a random number between 0 and 6
+     * Generates an array representing the current state of the word to guess, using underscores
+     * to represent unguessed letters and initializing the array based on the length of the chosen word.
+     *
+     * @param chosenWordArray The array containing the characters of the word to guess.
+     * @return An array of underscores with the same length as the chosen word.
      */
     public static char[] generateGuessArray(char[] chosenWordArray) {
         char[] guessBoard = new char[chosenWordArray.length];
@@ -192,6 +272,16 @@ public class Hangman{
         }
         return guessBoard;
     }
+
+    /**
+     * Function name: checkGuess
+     *
+     * Checks if a guessed letter exists in the chosen word.
+     *
+     * @param guess The letter guessed by the player.
+     * @param chosenWord The array containing the characters of the chosen word.
+     * @return true if the guessed letter exists in the chosen word, otherwise false.
+     */
 
     public static boolean checkGuess(char guess, char[] chosenWord) {
 
@@ -203,6 +293,15 @@ public class Hangman{
         return false;
     }
 
+    /**
+     * Function name: checkMisses
+     *
+     * Checks if a guessed letter has already been missed.
+     *
+     * @param guess The letter guessed by the player.
+     * @param misses A list of previously missed letters.
+     * @return true if the guessed letter has already been missed, otherwise true.
+     */
     public static boolean checkMisses(char guess, ArrayList<Character> misses){
         if(misses.contains(guess)){
             return true;
@@ -210,6 +309,15 @@ public class Hangman{
         return false;
     }
 
+    /**
+     * Funtion name: replaceLetters
+     *
+     * Replaces underscores in the guess board with the correct letter if the guess is correct.
+     *
+     * @param guessBoard The current state of the guess board.
+     * @param chosenWord The word that is being guessed.
+     * @param guess      The letter guessed by the player.
+     */
     public static void replaceLetters(char[] guessBoard, char[] chosenWord, char guess) {
 
         for (int i = 0; i < chosenWord.length; i++) {
@@ -219,21 +327,53 @@ public class Hangman{
         }
     }
 
+    /**
+     * Function name: printGuessArray
+     *
+     * Prints the current state of the guess board.
+     *
+     * @param guessBoard The current state of the guess board to be printed.
+     */
+
     public static void printGuessArray(char[] guessBoard) {
         for (int i = 0; i < guessBoard.length; i++) {
             System.out.print(guessBoard[i] + " ");
         }
     }
 
+    /**
+     * Funtion name: printMissesArray
+     *
+     * Prints the list of missed letters.
+     *
+     * @param misses The list of missed letters to be printed.
+     */
     public static void printMissesArray(ArrayList<Character> misses) {
         for(Character c : misses){
             System.out.print(c + " ");
         }
     }
 
+    /**
+     * Funtion name: printGallows
+     *
+     * Prints the hangman gallows based on the number of misses.
+     *
+     * @param missed The number of missed guesses to determine the hangman gallows.
+     */
+
     public static void printGallows(int missed) {
         System.out.println(gallows[missed]);
     }
+
+    /**
+     * Function name: hint
+     *
+     * Provides a hint in the hangman game by revealing a random letter in the word.
+     *
+     * @param guessBoard The current state of the guessing board.
+     * @param chosenWord The word to guess.
+     */
 
     public static void hint(char[] guessBoard, char[] chosenWord) {
         Random rand = new Random();
@@ -250,6 +390,15 @@ public class Hangman{
         }
     }
 
+    /**
+     * Function name: isFinished
+     *
+     * Checks if the hangman game has been completed by verifying if there are no more underscores
+     * in the guessing board.
+     *
+     * @param guessBoard The current state of the guessing board.
+     * @return           True if the game is finished, false otherwise.
+     */
     public static boolean isFinished(char[] guessBoard) {
 
         for (int i = 0; i < guessBoard.length; i++) {
