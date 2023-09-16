@@ -24,6 +24,23 @@ import java.util.*;
 public class Hangman{
 
     /**
+     * An array containing a list of words for the Hangman game.
+     *
+     * This array holds a predefined list of words that can be used as the target word
+     * for the Hangman game. In the game, one of these words is randomly selected for
+     * the player to guess.
+     */
+    public static final String[] words = {"ant", "baboon", "badger", "bat", "bear", "beaver", "camel",
+            "cat", "clam", "cobra", "cougar", "coyote", "crow", "deer",
+            "dog", "donkey", "duck", "eagle", "ferret", "fox", "frog", "goat",
+            "goose", "hawk", "lion", "lizard", "llama", "mole", "monkey", "moose",
+            "mouse", "mule", "newt", "otter", "owl", "panda", "parrot", "pigeon",
+            "python", "rabbit", "ram", "rat", "raven","rhino", "salmon", "seal",
+            "shark", "sheep", "skunk", "sloth", "snake", "spider", "stork", "swan",
+            "tiger", "toad", "trout", "turkey", "turtle", "weasel", "whale", "wolf",
+            "wombat", "zebra"};
+
+    /**
      * An array representing different stages of the Hangman gallows.
      *
      * This array contains ASCII art representations of the Hangman gallows at various stages of the game.
@@ -95,67 +112,28 @@ public class Hangman{
                     "     |\n" +
                     " ========="};
 
-    /**
-     * The maximum number of allowed incorrect guesses in the Hangman game.
-     * When a player reaches this limit, they lose the game.
-     */
-    public static final int MAX_MISSES = 6;
+    public static final int MAX_MISSES = 6; //The maximum number of allowed incorrect guesses in the Hangman game. When a player reaches this limit, they lose the game.
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
 
-        /**
-         * The current guessed letter in the Hangman game.
-         * It's initially set to a space character (' ').
-         */
-        char guess = ' ';
+        char guess = ' '; //The current guessed letter in the Hangman game. It's initially set to a space character (' ').
+        int hintCounter = 0; //The number of hints used by the player in the Hangman game. It's initially set to 0.
+        int missed = 0; //The number of incorrect guesses made by the player in the Hangman game. It's initially set to 0.
 
-        /**
-         * The number of hints used by the player in the Hangman game.
-         * It's initially set to 0.
-         */
-        int hintCounter = 0;
-
-        /**
-         * The number of incorrect guesses made by the player in the Hangman game.
-         * It's initially set to 0.
-         */
-        int missed = 0;
+        ArrayList<Character> misses = new ArrayList<>(); //Stores the missed letters in the Hangman game. It's initially an empty ArrayList.
 
         start();
+
         int mode = chooseGameMode();
 
-        /**
-         * Converts the chosen word obtained from user input into a character array.
-         */
-        char[] chosenWord = inputAWord().toCharArray();
-
-        /**
-         * Initializes an array to store the current guesses in the Hangman game,
-         * initially filled with underscores representing unguessed letters.
-         */
-        char[] guessArray = generateGuessArray(chosenWord);
-
-        /**
-         * Stores the missed letters in the Hangman game.
-         * It's initially an empty ArrayList.
-         */
-        ArrayList<Character> misses = new ArrayList<>();
-
         if(mode == 1){
-            System.out.println("EASY:");
-            hangmanEasyMode(guess,missed,hintCounter,misses,guessArray,chosenWord);
-        }
-        else if(mode == 2){
-            System.out.println("NORMAL");
-            hangmanNormalMode(guess,missed,misses,guessArray,chosenWord);
+            hangmanSinglePlayer(guess,missed,hintCounter,misses);
         }
         else{
-            System.out.println("HARD");
-            hangmanHardMode(guess,missed,misses,guessArray,chosenWord);
+            hangmanTwoPlayers(guess,missed,hintCounter,misses);
         }
-
         scanner.close();
     }
 
@@ -202,6 +180,17 @@ public class Hangman{
         return word;
     }
 
+    /**
+     * Function: chooseGameMode
+     *
+     * Allows the user to choose the game mode.
+     *
+     * This function displays a menu of available game modes and prompts the user to select one.
+     * The user can choose between single player mode, where the word is chosen by the computer,
+     * and two-player mode, where one player chooses the word, and the other player guesses it.
+     *
+     * @return The selected game mode: 1 for single player, 2 for two players.
+     */
     public static int chooseGameMode(){
         int mode;
         Scanner scanner = new Scanner(System.in);
@@ -209,9 +198,8 @@ public class Hangman{
         do{
             try{
                 System.out.println("Choose game mode: ");
-                System.out.println("1. Easy   [No time limit + one hint available]");
-                System.out.println("2. Normal [1:30 min time limit + no hint available]");
-                System.out.println("3. Hard   [1:00 min time limit + no hint available]");
+                System.out.println("1. Single player [The word is being chosen by a computer]");
+                System.out.println("2. Two players  [The word is being chosen by one of the players, and the other one tries to guess it]");
                 System.out.print("Game mode: ");
                 String input = scanner.nextLine();
                 InvalidNumberException.validateNumber(input);
@@ -227,19 +215,28 @@ public class Hangman{
     }
 
     /**
-     * Function game: hangmanEasyMode   TO UPDATE!!
+     * Function name: hangmanTwoPlayers
      *
-     * Starts the Hangman game loop, allowing the player to make guesses and manage the game.
+     * Runs the two-player mode of the Hangman game.
      *
-     * @param guess         The current guess made by the player.
-     * @param missed        The number of incorrect guesses made by the player.
-     * @param hintCounter   The number of hints used by the player [max. 1].
-     * @param misses        The list of letters that have been guessed incorrectly.
-     * @param guessArray    The array representing the current state of the word to guess.
-     * @param chosenWord    The word that the player needs to guess.
+     * In the two-player mode, one player enters a word, and the other player attempts to guess it.
+     * The game continues until the guessing player either correctly guesses the word or makes too many incorrect guesses.
+     *
+     * @param guess        The current guessed letter in the Hangman game.
+     *                     It's initially set to a space character (' ').
+     * @param missed       The number of incorrect guesses made by the guessing player.
+     *                     It's initially set to 0.
+     * @param hintCounter  The number of hints used by the guessing player in the Hangman game [max. 1].
+     *                     It's initially set to 0.
+     * @param misses       The list of letters that have been guessed incorrectly.
+     *                     It's initially an empty ArrayList.
      */
-    public static void hangmanEasyMode(char guess, int missed, int hintCounter, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
+    public static void hangmanTwoPlayers(char guess, int missed, int hintCounter, ArrayList<Character> misses){
         Scanner scanner = new Scanner(System.in);
+
+        String word = inputAWord();
+        char[] chosenWord = word.toCharArray();
+        char[] guessArray = generateGuessArray(chosenWord);
 
         boolean checker;
         while(true) {
@@ -304,7 +301,7 @@ public class Hangman{
                 printGuessArray(guessArray);
                 System.out.print("\n");
                 System.out.println("You lost!");
-                System.out.println("Word: " + Arrays.toString(chosenWord));
+                System.out.println("Word: " + word);
                 break;
             }
 
@@ -312,8 +309,31 @@ public class Hangman{
 
     }
 
-    public static void hangmanNormalMode(char guess, int missed, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
+    /**
+     * Function name: hangmanSinglePlayer
+     *
+     * Runs the single-player mode of the Hangman game where the word is chosen by the computer.
+     *
+     * In the single-player mode, the computer randomly selects a word, and the player attempts to guess it.
+     * The game continues until the player either correctly guesses the word or makes too many incorrect guesses.
+     *
+     * @param guess        The current guessed letter in the Hangman game.
+     *                     It's initially set to a space character (' ').
+     * @param missed       The number of incorrect guesses made by the player.
+     *                     It's initially set to 0.
+     * @param hintCounter  The number of hints used by the player in the Hangman game [max. 1].
+     *                     It's initially set to 0.
+     * @param misses       The list of letters that have been guessed incorrectly.
+     *                     It's initially an empty ArrayList.
+     */
+
+    public static void hangmanSinglePlayer(char guess, int missed, int hintCounter, ArrayList<Character> misses){
         Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+
+        int index = random.nextInt(words.length);
+        char[] chosenWord = words[index].toCharArray();
+        char[] guessArray = generateGuessArray(chosenWord);
 
         boolean checker;
         while(true) {
@@ -328,64 +348,30 @@ public class Hangman{
             printGallows(missed);
             printGuessArray(guessArray);
             System.out.print("\n");
+            if (hintCounter == 0) {
+                System.out.println("Wanna use a hint? Press '?'");
+            }
+            System.out.print("\n");
             System.out.print("Your letter: ");
 
-            try{
+            try {
                 guess = scanner.next().charAt(0);
                 InvalidCharacterException.validateInput(guess);
-            } catch(InvalidCharacterException e){
+            } catch (InvalidCharacterException e) {
                 System.err.println(e.getMessage());
                 continue;
             }
 
             guess = Character.toLowerCase(guess);
 
-            checker = checkGuess(guess, chosenWord);
-
-            if (checker) {
-                replaceLetters(guessArray, chosenWord, guess);
-            } else {
-                System.out.println("Wrong letter!");
-                if (!checkMisses(guess, misses)) {
-                    misses.add(guess);
-                    missed++;
-                }
+            if (guess == '?' && hintCounter == 0) {
+                hint(guessArray, chosenWord);
+                hintCounter++;
+                continue;
+            } else if (guess == '?' && hintCounter != 0) {
+                System.out.println("You can't use a hint once again :(");
+                continue;
             }
-
-            if (isFinished(guessArray)) {
-                printGallows(missed);
-                printGuessArray(guessArray);
-                System.out.print("\n");
-                System.out.println("You won!");
-                break;
-            }
-
-            if (missed == 6) {
-                printGallows(missed);
-                printGuessArray(guessArray);
-                System.out.print("\n");
-                System.out.println("You lost!");
-                System.out.println("Word: " + Arrays.toString(chosenWord));
-                break;
-            }
-
-        }
-
-    }
-
-    public static void hangmanHardMode(char guess, int missed, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
-        Scanner scanner = new Scanner(System.in);
-
-        boolean checker;
-        while(true) {
-            System.out.print("Missed letters: ");
-            printMissesArray(misses);
-            System.out.print("\n");
-            printGallows(missed);
-            printGuessArray(guessArray);
-            System.out.print("\n");
-
-            guess = Character.toLowerCase(guess);
 
             checker = checkGuess(guess, chosenWord);
 
@@ -412,9 +398,10 @@ public class Hangman{
                 printGuessArray(guessArray);
                 System.out.print("\n");
                 System.out.println("You lost!");
-                System.out.println("Word: " + Arrays.toString(chosenWord));
+                System.out.println("Word: " + words[index]);
                 break;
             }
+
         }
     }
 
