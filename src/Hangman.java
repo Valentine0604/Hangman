@@ -33,12 +33,12 @@ public class Hangman{
     public static final String[] gallows = {
             // ASCII art for the gallows with 0 incorrect guesses
             "+---+\n" +
-            "|   |\n" +
-            "    |\n" +
-            "    |\n" +
-            "    |\n" +
-            "    |\n" +
-            "=========",
+                    "|   |\n" +
+                    "    |\n" +
+                    "    |\n" +
+                    "    |\n" +
+                    "    |\n" +
+                    "=========",
 
             // ASCII art for the gallows with 1 incorrect guess
             "+---+\n" +
@@ -124,6 +124,7 @@ public class Hangman{
         int missed = 0;
 
         start();
+        int mode = chooseGameMode();
 
         /**
          * Converts the chosen word obtained from user input into a character array.
@@ -142,7 +143,18 @@ public class Hangman{
          */
         ArrayList<Character> misses = new ArrayList<>();
 
-        hangmanGame(guess,missed,hintCounter,misses,guessArray,chosenWord);
+        if(mode == 1){
+            System.out.println("EASY:");
+            hangmanEasyMode(guess,missed,hintCounter,misses,guessArray,chosenWord);
+        }
+        else if(mode == 2){
+            System.out.println("NORMAL");
+            hangmanNormalMode(guess,missed,misses,guessArray,chosenWord);
+        }
+        else{
+            System.out.println("HARD");
+            hangmanHardMode(guess,missed,misses,guessArray,chosenWord);
+        }
 
         scanner.close();
     }
@@ -190,8 +202,32 @@ public class Hangman{
         return word;
     }
 
+    public static int chooseGameMode(){
+        int mode;
+        Scanner scanner = new Scanner(System.in);
+
+        do{
+            try{
+                System.out.println("Choose game mode: ");
+                System.out.println("1. Easy   [No time limit + one hint available]");
+                System.out.println("2. Normal [1:30 min time limit + no hint available]");
+                System.out.println("3. Hard   [1:00 min time limit + no hint available]");
+                System.out.print("Game mode: ");
+                String input = scanner.nextLine();
+                InvalidNumberException.validateNumber(input);
+
+                mode = Integer.parseInt(input);
+            } catch(InvalidNumberException e){
+                System.err.println(e.getMessage());
+                mode = -1;
+            }
+        }while(mode !=1 && mode != 2 && mode != 3);
+
+        return mode;
+    }
+
     /**
-     * Function game: hangmanGame
+     * Function game: hangmanEasyMode   TO UPDATE!!
      *
      * Starts the Hangman game loop, allowing the player to make guesses and manage the game.
      *
@@ -202,7 +238,7 @@ public class Hangman{
      * @param guessArray    The array representing the current state of the word to guess.
      * @param chosenWord    The word that the player needs to guess.
      */
-    public static void hangmanGame(char guess, int missed, int hintCounter, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
+    public static void hangmanEasyMode(char guess, int missed, int hintCounter, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
         Scanner scanner = new Scanner(System.in);
 
         boolean checker;
@@ -274,6 +310,112 @@ public class Hangman{
 
         }
 
+    }
+
+    public static void hangmanNormalMode(char guess, int missed, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
+        Scanner scanner = new Scanner(System.in);
+
+        boolean checker;
+        while(true) {
+            if (guess == '?') {
+                System.out.println("Current letter: ");
+            } else {
+                System.out.println("Current letter: " + guess);
+            }
+            System.out.print("Missed letters: ");
+            printMissesArray(misses);
+            System.out.print("\n");
+            printGallows(missed);
+            printGuessArray(guessArray);
+            System.out.print("\n");
+            System.out.print("Your letter: ");
+
+            try{
+                guess = scanner.next().charAt(0);
+                InvalidCharacterException.validateInput(guess);
+            } catch(InvalidCharacterException e){
+                System.err.println(e.getMessage());
+                continue;
+            }
+
+            guess = Character.toLowerCase(guess);
+
+            checker = checkGuess(guess, chosenWord);
+
+            if (checker) {
+                replaceLetters(guessArray, chosenWord, guess);
+            } else {
+                System.out.println("Wrong letter!");
+                if (!checkMisses(guess, misses)) {
+                    misses.add(guess);
+                    missed++;
+                }
+            }
+
+            if (isFinished(guessArray)) {
+                printGallows(missed);
+                printGuessArray(guessArray);
+                System.out.print("\n");
+                System.out.println("You won!");
+                break;
+            }
+
+            if (missed == 6) {
+                printGallows(missed);
+                printGuessArray(guessArray);
+                System.out.print("\n");
+                System.out.println("You lost!");
+                System.out.println("Word: " + Arrays.toString(chosenWord));
+                break;
+            }
+
+        }
+
+    }
+
+    public static void hangmanHardMode(char guess, int missed, ArrayList<Character> misses, char[] guessArray, char[] chosenWord){
+        Scanner scanner = new Scanner(System.in);
+
+        boolean checker;
+        while(true) {
+            System.out.print("Missed letters: ");
+            printMissesArray(misses);
+            System.out.print("\n");
+            printGallows(missed);
+            printGuessArray(guessArray);
+            System.out.print("\n");
+
+            guess = Character.toLowerCase(guess);
+
+            checker = checkGuess(guess, chosenWord);
+
+            if (checker) {
+                replaceLetters(guessArray, chosenWord, guess);
+            } else {
+                System.out.println("Wrong letter!");
+                if (!checkMisses(guess, misses)) {
+                    misses.add(guess);
+                    missed++;
+                }
+            }
+
+            if (isFinished(guessArray)) {
+                printGallows(missed);
+                printGuessArray(guessArray);
+                System.out.print("\n");
+                System.out.println("You won!");
+                break;
+            }
+
+            if (missed == 6) {
+                printGallows(missed);
+                printGuessArray(guessArray);
+                System.out.print("\n");
+                System.out.println("You lost!");
+                System.out.println("Word: " + Arrays.toString(chosenWord));
+                break;
+            }
+        }
     }
 
     /**
